@@ -43,22 +43,32 @@ export default function Results() {
   const downloadPDF = async () => {
     setIsGeneratingPDF(true);
     const element = document.getElementById('report-content');
-    if (!element) return;
+    if (!element) {
+      setIsGeneratingPDF(false);
+      return;
+    }
 
     try {
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
+      // FIX: Added useCORS and changed to lightweight JPEG
+      const canvas = await html2canvas(element, { 
+        scale: 2,
+        useCORS: true, 
+        allowTaint: true 
+      });
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.8);
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       pdf.save('MedicalPlain-Analysis.pdf');
     } catch (error) {
       console.error('Error generating PDF', error);
       alert('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
     }
-    setIsGeneratingPDF(false);
   };
 
   if (!data) return <div className="min-h-screen flex items-center justify-center"><p>Loading...</p></div>;

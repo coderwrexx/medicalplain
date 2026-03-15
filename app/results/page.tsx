@@ -171,7 +171,7 @@ export default function Results() {
                     {med.importantNote && <div style={{ backgroundColor: '#eff6ff', borderLeft: '4px solid #2563eb', padding: '10px 12px', borderRadius: '0 12px 12px 0' }}><p style={{ fontSize: '13px', color: '#1e40af', fontWeight: '500', margin: 0 }}>📌 {med.importantNote}</p></div>}
                     <div style={{ backgroundColor: '#f0fdf4', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div><p style={{ fontSize: '11px', color: '#166534', fontWeight: '700', margin: '0 0 2px 0' }}>💊 Buy Online</p><p style={{ fontSize: '11px', color: '#15803d', margin: 0 }}>Best price — Netmeds</p></div>
-                      <a href={`https://www.netmeds.com/catalogsearch/result?q=${encodeURIComponent(med.name)}`} target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#16a34a', color: 'white', fontSize: '12px', padding: '6px 14px', borderRadius: '10px', fontWeight: '600', textDecoration: 'none' }}>Buy →</a>
+                      <a href={`https://www.netmeds.com/products?q=${encodeURIComponent(med.name)}`} target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#16a34a', color: 'white', fontSize: '12px', padding: '6px 14px', borderRadius: '10px', fontWeight: '600', textDecoration: 'none' }}>Buy →</a>
                     </div>
                     {(med.overdoseRisk || med.addictionRisk || med.pregnancySafe) && (
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', textAlign: 'center' }}>
@@ -243,7 +243,7 @@ export default function Results() {
 
         <div style={{ backgroundColor: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '20px', padding: '16px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div><p style={{ fontWeight: '700', color: '#1e40af', fontSize: '14px', margin: '0 0 2px 0' }}>🩺 Book a Real Doctor</p><p style={{ fontSize: '12px', color: '#2563eb', margin: 0 }}>Practo — Video or clinic visit</p></div>
-          <a href="https://www.practo.com" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#2563eb', color: 'white', fontSize: '12px', padding: '8px 16px', borderRadius: '12px', fontWeight: '600', textDecoration: 'none' }}>Book →</a>
+          <a href="https://www.practo.com/consult/direct/new_consultation" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#2563eb', color: 'white', fontSize: '12px', padding: '8px 16px', borderRadius: '12px', fontWeight: '600', textDecoration: 'none' }}>Book →</a>
         </div>
 
         <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #86efac', borderRadius: '20px', padding: '16px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

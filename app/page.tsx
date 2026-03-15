@@ -125,7 +125,7 @@ export default function Home() {
               <span style={{ fontSize: '28px' }}>🩺</span>
               <div><p style={{ fontWeight: '700', color: '#166534', fontSize: '14px', margin: '0 0 2px 0' }}>Book a real doctor</p><p style={{ fontSize: '12px', color: '#16a34a', margin: 0 }}>Practo — trusted by 20M patients</p></div>
             </div>
-            <a href="https://www.practo.com" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#16a34a', color: 'white', fontSize: '12px', padding: '8px 16px', borderRadius: '12px', fontWeight: '600', textDecoration: 'none', whiteSpace: 'nowrap' }}>Book →</a>
+            <a href="https://www.practo.com/consult/direct/new_consultation" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#16a34a', color: 'white', fontSize: '12px', padding: '8px 16px', borderRadius: '12px', fontWeight: '600', textDecoration: 'none', whiteSpace: 'nowrap' }}>Book →</a>
           </div>
 
           <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid #93c5fd', borderRadius: '16px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

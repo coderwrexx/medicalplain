@@ -116,7 +116,7 @@ export default function Emergency() {
           </div>
           {location && (
             <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <a href={`https://www.practo.com/search/doctors?city=nearby`} target="_blank" rel="noopener noreferrer"
+              <a href={`https://www.practo.com/consult/direct/new_consultation`} target="_blank" rel="noopener noreferrer"
                 style={{ backgroundColor: '#2563eb', color: 'white', borderRadius: '12px', padding: '10px', fontSize: '12px', textDecoration: 'none', textAlign: 'center', fontWeight: '600', display: 'block' }}>
                 🩺 Book Doctor Now
               </a>

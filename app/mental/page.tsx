@@ -129,7 +129,7 @@ Be compassionate, detailed, and non-judgmental.`
             {score >= 15 && (
               <div className="mt-4 bg-red-50 border-2 border-red-200 rounded-xl p-3">
                 <p className="text-red-700 font-bold text-sm">⚠️ Please seek professional help</p>
-                <a href="https://www.practo.com/search/doctors?specialization=Psychiatrist" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.practo.com/consult/direct/new_consultation" target="_blank" rel="noopener noreferrer"
                   className="block mt-2 bg-red-600 text-white text-center py-2 rounded-xl text-sm font-semibold">
                   Find a Psychiatrist on Practo →
                 </a>

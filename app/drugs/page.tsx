@@ -91,7 +91,7 @@ Be comprehensive and use simple language.`
           <div className="bg-white rounded-2xl p-5 shadow-sm border">
             <h2 className="font-bold text-gray-900 mb-3 text-lg">📋 {query}</h2>
             <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{result}</div>
-            <a href={`https://www.netmeds.com/catalogsearch/result?q=${encodeURIComponent(query)}`}
+            <a href={`https://www.netmeds.com/products?q=${encodeURIComponent(query)}`}
               target="_blank" rel="noopener noreferrer"
               className="mt-4 block text-center bg-green-600 text-white py-2 rounded-xl text-sm font-semibold">
               💊 Buy {query} on Netmeds →

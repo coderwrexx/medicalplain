@@ -32,128 +32,121 @@ export default function Home() {
         const data = await response.json();
         localStorage.setItem('analysisResult', JSON.stringify(data));
         const history = JSON.parse(localStorage.getItem('medHistory') || '[]');
-        history.unshift({
-          id: Date.now().toString(),
-          date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-          documentType: data.documentType || 'document',
-          summary: data.summary || '',
-          riskScore: data.overallRiskScore || '',
-          data: data,
-        });
+        history.unshift({ id: Date.now().toString(), date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }), documentType: data.documentType || 'document', summary: data.summary || '', riskScore: data.overallRiskScore || '', data });
         localStorage.setItem('medHistory', JSON.stringify(history.slice(0, 20)));
         router.push('/results');
-      } catch {
-        alert('Something went wrong. Please try again.');
-        setLoading(false);
-      }
+      } catch { alert('Something went wrong. Please try again.'); setLoading(false); }
     };
     reader.readAsDataURL(file);
   };
 
   const tools = [
-    { icon: '👨‍⚕️', title: 'Ask Doctor', desc: 'MBBS AI with voice', action: () => router.push('/chat'), color: 'bg-blue-600', badge: null },
-    { icon: '🩺', title: 'Symptom Check', desc: 'Identify conditions', action: () => router.push('/symptoms'), color: 'bg-green-600', badge: null },
-    { icon: '🔄', title: 'Drug Interactions', desc: 'Check drug safety', action: () => router.push('/interactions'), color: 'bg-orange-500', badge: null },
-    { icon: '💊', title: 'Drug Database', desc: 'Any medicine info', action: () => router.push('/drugs'), color: 'bg-purple-600', badge: null },
-    { icon: '📊', title: 'Health Dashboard', desc: 'BMI, BP, sugar', action: () => router.push('/dashboard'), color: 'bg-teal-600', badge: null },
-    { icon: '🧠', title: 'Mental Health', desc: 'PHQ-9 screening', action: () => router.push('/mental'), color: 'bg-indigo-600', badge: null },
-    { icon: '🍎', title: 'Nutrition AI', desc: 'Analyze any food', action: () => router.push('/nutrition'), color: 'bg-lime-600', badge: null },
-    { icon: '⏰', title: 'Med Reminders', desc: reminderCount > 0 ? `${reminderCount} active` : 'Never miss dose', action: () => router.push('/reminders'), color: 'bg-red-500', badge: reminderCount > 0 ? reminderCount : null },
-    { icon: '📋', title: 'Health History', desc: historyCount > 0 ? `${historyCount} records` : 'Past analyses', action: () => router.push('/history'), color: 'bg-gray-600', badge: historyCount > 0 ? historyCount : null },
-    { icon: '🚨', title: 'Emergency', desc: '108 • First aid', action: () => router.push('/emergency'), color: 'bg-red-700', badge: null },
+    { icon: '👨‍⚕️', title: 'Ask Doctor', desc: 'Voice + text AI doctor', path: '/chat', color: '#2563eb' },
+    { icon: '🩺', title: 'Symptom Check', desc: 'Identify conditions', path: '/symptoms', color: '#16a34a' },
+    { icon: '📸', title: 'Photo Diagnosis', desc: 'Scan skin, eye, wound', path: '/scan', color: '#db2777' },
+    { icon: '🔍', title: 'Second Opinion', desc: '3 specialist views', path: '/secondopinion', color: '#7c3aed' },
+    { icon: '🔄', title: 'Drug Interactions', desc: 'Check drug safety', path: '/interactions', color: '#ea580c' },
+    { icon: '💊', title: 'Drug Database', desc: 'Any medicine info', path: '/drugs', color: '#9333ea' },
+    { icon: '📊', title: 'Health Dashboard', desc: 'BMI, BP, sugar score', path: '/dashboard', color: '#0891b2' },
+    { icon: '📈', title: 'Health Trends', desc: 'Pattern detection', path: '/trends', color: '#0e7490' },
+    { icon: '🧠', title: 'Mental Health', desc: 'PHQ-9 screening', path: '/mental', color: '#4338ca' },
+    { icon: '🍎', title: 'Nutrition AI', desc: 'Analyze any food', path: '/nutrition', color: '#65a30d' },
+    { icon: '⏰', title: 'Med Reminders', desc: reminderCount > 0 ? `${reminderCount} active` : 'Never miss dose', path: '/reminders', color: '#dc2626' },
+    { icon: '📋', title: 'Health History', desc: historyCount > 0 ? `${historyCount} records` : 'Past analyses', path: '/history', color: '#4b5563' },
+    { icon: '📤', title: 'Share Report', desc: 'Beautiful report card', path: '/share', color: '#059669' },
+    { icon: '🚨', title: 'Emergency', desc: '108 + First Aid', path: '/emergency', color: '#b91c1c' },
   ];
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="max-w-2xl mx-auto px-4 py-5">
+    <main style={{ minHeight: '100vh', backgroundColor: 'var(--bg-secondary)' }}>
+      <div style={{ maxWidth: '640px', margin: '0 auto', padding: '16px' }}>
 
-        <div className="text-center mb-5">
-          <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded-full text-xs mb-2">
-            🏥 World-Class Medical AI
+        <div style={{ textAlign: 'center', paddingTop: '16px', marginBottom: '20px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#2563eb', color: 'white', padding: '4px 14px', borderRadius: '20px', fontSize: '12px', marginBottom: '10px' }}>
+            🏆 World's Best Free Medical AI
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-1">MedicalPlain</h1>
-          <p className="text-gray-600 text-sm">Your complete personal medical AI — for every health question</p>
-          <div className="flex justify-center gap-3 mt-2 text-xs text-gray-400 flex-wrap">
-            <span>✅ Free</span><span>✅ MBBS-level AI</span><span>✅ Voice enabled</span><span>✅ Works offline</span>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 6px 0' }}>MedicalPlain</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '0 0 8px 0' }}>Your complete personal medical AI — smarter than any app, completely free</p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', fontSize: '12px', color: 'var(--text-muted)' }}>
+            <span>✅ Free forever</span><span>✅ MBBS-level AI</span><span>✅ Voice + Photo</span><span>✅ 14 health tools</span>
           </div>
         </div>
 
         <div
-          className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all mb-4 ${
-            dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50'
-          }`}
+          onClick={() => document.getElementById('fileInput')?.click()}
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={(e) => { e.preventDefault(); setDragOver(false); const file = e.dataTransfer.files[0]; if (file) handleFile(file); }}
-          onClick={() => document.getElementById('fileInput')?.click()}
-        >
+          style={{ border: `2px dashed ${dragOver ? '#2563eb' : 'var(--border-color)'}`, borderRadius: '20px', padding: '32px 16px', textAlign: 'center', cursor: 'pointer', backgroundColor: dragOver ? '#eff6ff' : 'var(--bg-card)', marginBottom: '16px', transition: 'all 0.2s' }}>
           {loading ? (
             <div>
-              <div className="text-4xl mb-2">🔬</div>
-              <p className="font-semibold text-blue-600">Running clinical analysis...</p>
-              <p className="text-gray-500 text-sm mt-1">Checking drugs, interactions, risk scores</p>
-              <div className="mt-3 bg-blue-100 rounded-full h-1.5 w-40 mx-auto overflow-hidden">
-                <div className="bg-blue-600 h-full rounded-full animate-pulse w-3/4"/>
+              <div style={{ fontSize: '40px', marginBottom: '8px' }}>🔬</div>
+              <p style={{ fontWeight: '600', color: '#2563eb', margin: '0 0 4px 0' }}>Running clinical analysis...</p>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0 }}>Checking drugs, interactions, risk scores</p>
+              <div style={{ marginTop: '12px', backgroundColor: '#dbeafe', borderRadius: '8px', height: '6px', width: '160px', margin: '12px auto 0', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '75%', backgroundColor: '#2563eb', borderRadius: '8px', animation: 'pulse 1.5s infinite' }}/>
               </div>
             </div>
           ) : (
             <div>
-              <div className="text-5xl mb-2">📋</div>
-              <p className="text-lg font-semibold text-gray-700">Upload Medical Document</p>
-              <p className="text-gray-500 text-sm">Prescription • Lab Report • Discharge Summary</p>
-              <p className="text-xs text-gray-400 mt-1">JPG • PNG • PDF</p>
-              <div className="mt-3 bg-blue-600 text-white px-5 py-2 rounded-full inline-block text-sm font-medium">Choose File</div>
+              <div style={{ fontSize: '48px', marginBottom: '8px' }}>📋</div>
+              <p style={{ fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)', margin: '0 0 4px 0' }}>Upload Medical Document</p>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 4px 0' }}>Prescription • Lab Report • Discharge Summary</p>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 12px 0' }}>JPG • PNG • PDF</p>
+              <span style={{ backgroundColor: '#2563eb', color: 'white', padding: '8px 24px', borderRadius: '20px', fontSize: '14px', fontWeight: '600' }}>Choose File</span>
             </div>
           )}
         </div>
 
-        <input id="fileInput" type="file" accept="image/*,.pdf" className="hidden"
+        <input id="fileInput" type="file" accept="image/*,.pdf" style={{ display: 'none' }}
           onChange={(e) => { const file = e.target.files?.[0]; if (file) handleFile(file); }} />
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
           {tools.map((t, i) => (
-            <button key={i} onClick={t.action}
-              className="bg-white rounded-2xl p-4 shadow-sm border text-left hover:shadow-md transition-all hover:border-blue-200 relative">
-              {t.badge && (
-                <span className="absolute top-2 right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                  {t.badge}
+            <button key={i} onClick={() => router.push(t.path)}
+              style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '16px', textAlign: 'left', cursor: 'pointer', position: 'relative', boxShadow: 'var(--shadow)', transition: 'all 0.2s' }}>
+              {(t.path === '/reminders' && reminderCount > 0) || (t.path === '/history' && historyCount > 0) ? (
+                <span style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#dc2626', color: 'white', fontSize: '10px', width: '18px', height: '18px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700' }}>
+                  {t.path === '/reminders' ? reminderCount : historyCount}
                 </span>
-              )}
-              <div className={`w-10 h-10 ${t.color} rounded-xl flex items-center justify-center text-xl mb-2`}>{t.icon}</div>
-              <p className="font-bold text-gray-900 text-sm">{t.title}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{t.desc}</p>
+              ) : null}
+              <div style={{ width: '42px', height: '42px', backgroundColor: t.color, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '10px' }}>
+                {t.icon}
+              </div>
+              <p style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '14px', margin: '0 0 3px 0' }}>{t.title}</p>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>{t.desc}</p>
             </button>
           ))}
         </div>
 
-        <div className="space-y-3 mb-4">
-          <div className="bg-gradient-to-r from-green-50 to-teal-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🩺</span>
-              <div><p className="font-bold text-green-800 text-sm">Book a real doctor</p><p className="text-xs text-green-600">Trusted by 20 million patients</p></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+          <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid #86efac', borderRadius: '16px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '28px' }}>🩺</span>
+              <div><p style={{ fontWeight: '700', color: '#166534', fontSize: '14px', margin: '0 0 2px 0' }}>Book a real doctor</p><p style={{ fontSize: '12px', color: '#16a34a', margin: 0 }}>Practo — trusted by 20M patients</p></div>
             </div>
-            <a href="https://www.practo.com" target="_blank" rel="noopener noreferrer" className="bg-green-600 text-white text-xs px-3 py-2 rounded-xl font-semibold whitespace-nowrap">Practo →</a>
+            <a href="https://www.practo.com" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#16a34a', color: 'white', fontSize: '12px', padding: '8px 16px', borderRadius: '12px', fontWeight: '600', textDecoration: 'none', whiteSpace: 'nowrap' }}>Book →</a>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🛡️</span>
-              <div><p className="font-bold text-blue-800 text-sm">Health Insurance</p><p className="text-xs text-blue-600">Compare plans free</p></div>
+          <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid #93c5fd', borderRadius: '16px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '28px' }}>🛡️</span>
+              <div><p style={{ fontWeight: '700', color: '#1e40af', fontSize: '14px', margin: '0 0 2px 0' }}>Health Insurance</p><p style={{ fontSize: '12px', color: '#2563eb', margin: 0 }}>InsuranceDekho — free comparison</p></div>
             </div>
-            <a href="https://www.insurancedekho.com/health-insurance" target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white text-xs px-3 py-2 rounded-xl font-semibold whitespace-nowrap">Get Quote →</a>
+            <a href="https://www.insurancedekho.com/health-insurance" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#2563eb', color: 'white', fontSize: '12px', padding: '8px 16px', borderRadius: '12px', fontWeight: '600', textDecoration: 'none', whiteSpace: 'nowrap' }}>Quote →</a>
           </div>
 
-          <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🚨</span>
-              <div><p className="font-bold text-red-800 text-sm">Medical Emergency?</p><p className="text-xs text-red-600">Ambulance • First Aid guide</p></div>
+          <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid #fca5a5', borderRadius: '16px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '28px' }}>🚨</span>
+              <div><p style={{ fontWeight: '700', color: '#991b1b', fontSize: '14px', margin: '0 0 2px 0' }}>Medical Emergency</p><p style={{ fontSize: '12px', color: '#dc2626', margin: 0 }}>Ambulance 108 • First Aid guide</p></div>
             </div>
-            <button onClick={() => router.push('/emergency')} className="bg-red-600 text-white text-xs px-3 py-2 rounded-xl font-semibold">SOS →</button>
+            <button onClick={() => router.push('/emergency')} style={{ backgroundColor: '#dc2626', color: 'white', fontSize: '12px', padding: '8px 16px', borderRadius: '12px', fontWeight: '600', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>SOS →</button>
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mb-4">
-          For educational purposes only. Always consult a doctor for medical decisions. Emergency: 112
+        <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-muted)', paddingBottom: '100px' }}>
+          Educational purposes only. Always consult a doctor. Emergency: 112
         </p>
       </div>
     </main>

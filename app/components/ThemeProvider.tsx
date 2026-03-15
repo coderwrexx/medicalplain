@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState('light');
   const [showDisclaimer, setShowDisclaimer] = useState(false);
-  const [showThemePanel, setShowThemePanel] = useState(false);
+  const [showPanel, setShowPanel] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') || 'light';
@@ -18,7 +18,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     setTheme(t);
     localStorage.setItem('theme', t);
     document.documentElement.setAttribute('data-theme', t);
-    setShowThemePanel(false);
+    setShowPanel(false);
   };
 
   const acceptDisclaimer = () => {
@@ -26,55 +26,59 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     setShowDisclaimer(false);
   };
 
+  const themes = [
+    { id: 'light', label: '☀️ Light', desc: 'Default' },
+    { id: 'dark', label: '🌙 Dark', desc: 'Night mode' },
+    { id: 'warm', label: '🌅 Warm', desc: 'Eye comfort' },
+  ];
+
+  const icon = theme === 'dark' ? '🌙' : theme === 'warm' ? '🌅' : '☀️';
+
   return (
     <>
       {showDisclaimer && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <div className="text-center mb-4">
-              <div className="text-5xl mb-2">⚕️</div>
-              <h2 className="text-xl font-bold text-gray-900">Medical Disclaimer</h2>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '16px' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '24px', padding: '24px', maxWidth: '420px', width: '100%', boxShadow: '0 25px 50px rgba(0,0,0,0.25)' }}>
+            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '8px' }}>⚕️</div>
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#111827', margin: 0 }}>Medical Disclaimer</h2>
             </div>
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
-              <p className="text-red-800 text-sm font-semibold mb-2">⚠️ IMPORTANT — Please Read</p>
-              <p className="text-red-700 text-xs leading-relaxed">MedicalPlain provides AI-generated information for <strong>educational purposes only</strong>. It is NOT a substitute for professional medical advice, diagnosis, or treatment.</p>
+            <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '16px', padding: '16px', marginBottom: '16px' }}>
+              <p style={{ color: '#991b1b', fontSize: '13px', fontWeight: '600', margin: '0 0 8px 0' }}>⚠️ IMPORTANT — Please Read</p>
+              <p style={{ color: '#b91c1c', fontSize: '12px', lineHeight: '1.6', margin: 0 }}>MedicalPlain provides AI-generated information for <strong>educational purposes only</strong>. It is NOT a substitute for professional medical advice, diagnosis, or treatment.</p>
             </div>
-            <div className="space-y-2 mb-5 text-xs text-gray-600">
-              <p>✅ Always consult a qualified doctor before taking any medication</p>
-              <p>✅ Never disregard professional medical advice based on AI output</p>
-              <p>✅ In emergencies, call 108 (Ambulance) or 112 immediately</p>
-              <p>✅ AI analysis may not be 100% accurate — verify with a doctor</p>
-              <p>✅ You are responsible for your own medical decisions</p>
+            <div style={{ marginBottom: '16px' }}>
+              {['Always consult a qualified doctor before taking any medication', 'Never disregard professional medical advice based on AI output', 'In emergencies, call 108 (Ambulance) or 112 immediately', 'AI analysis may not be 100% accurate — verify with a doctor', 'You are responsible for your own medical decisions'].map((item, i) => (
+                <p key={i} style={{ fontSize: '12px', color: '#374151', margin: '4px 0' }}>✅ {item}</p>
+              ))}
             </div>
-            <p className="text-xs text-gray-400 mb-4 text-center">By continuing, you acknowledge that MedicalPlain is not liable for any health decisions made based on this information.</p>
-            <button onClick={acceptDisclaimer}
-              className="w-full bg-blue-600 text-white font-bold py-3 rounded-2xl text-sm">
+            <p style={{ fontSize: '11px', color: '#9ca3af', textAlign: 'center', marginBottom: '16px' }}>By continuing, you acknowledge MedicalPlain is not liable for any health decisions made based on this information.</p>
+            <button onClick={acceptDisclaimer} style={{ width: '100%', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '16px', padding: '14px', fontSize: '15px', fontWeight: '700', cursor: 'pointer' }}>
               I Understand — Continue
             </button>
           </div>
         </div>
       )}
 
-      <div className="fixed bottom-20 right-4 z-40">
-        <button onClick={() => setShowThemePanel(!showThemePanel)}
-          className="w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg"
-          style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-          {theme === 'dark' ? '🌙' : theme === 'warm' ? '🌅' : '☀️'}
+      {/* Floating theme button — fixed bottom right, small */}
+      <div style={{ position: 'fixed', bottom: '80px', right: '16px', zIndex: 1000 }}>
+        <button
+          onClick={() => setShowPanel(!showPanel)}
+          style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}>
+          {icon}
         </button>
-        {showThemePanel && (
-          <div className="absolute bottom-12 right-0 rounded-2xl shadow-xl p-3 w-48"
-            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-            <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Display Mode</p>
-            {[
-              { id: 'light', label: '☀️ Light Mode', desc: 'Default' },
-              { id: 'dark', label: '🌙 Dark Mode', desc: 'Easy on eyes at night' },
-              { id: 'warm', label: '🌅 Warm Mode', desc: 'Sepia tone — eye comfort' },
-            ].map(t => (
-              <button key={t.id} onClick={() => setThemeMode(t.id)}
-                className="w-full text-left p-2 rounded-xl mb-1 transition-all"
-                style={{ backgroundColor: theme === t.id ? 'var(--blue-accent)' : 'transparent', color: theme === t.id ? 'white' : 'var(--text-primary)' }}>
-                <p className="text-sm font-medium">{t.label}</p>
-                <p className="text-xs opacity-70">{t.desc}</p>
+
+        {showPanel && (
+          <div style={{ position: 'absolute', bottom: '52px', right: 0, backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '12px', width: '180px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', margin: '0 0 8px 0', textTransform: 'uppercase' }}>Display Mode</p>
+            {themes.map(t => (
+              <button key={t.id} onClick={() => setThemeMode(t.id)} style={{
+                width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: '10px', border: 'none', cursor: 'pointer', marginBottom: '4px', display: 'block',
+                backgroundColor: theme === t.id ? '#2563eb' : 'transparent',
+                color: theme === t.id ? 'white' : 'var(--text-primary)',
+              }}>
+                <p style={{ fontSize: '13px', fontWeight: '600', margin: 0 }}>{t.label}</p>
+                <p style={{ fontSize: '11px', margin: 0, opacity: 0.7 }}>{t.desc}</p>
               </button>
             ))}
           </div>

@@ -10,6 +10,7 @@ interface Reminder {
   frequency: string;
   withFood: boolean;
   active: boolean;
+  purpose?: string;
 }
 
 export default function Reminders() {
@@ -30,16 +31,8 @@ export default function Reminders() {
 
   const add = () => {
     if (!form.medicine.trim()) return;
-    const newReminder: Reminder = {
-      id: Date.now().toString(),
-      medicine: form.medicine,
-      dosage: form.dosage,
-      time: form.time,
-      frequency: form.frequency,
-      withFood: form.withFood,
-      active: true,
-    };
-    save([...reminders, newReminder]);
+    const newR: Reminder = { id: Date.now().toString(), medicine: form.medicine, dosage: form.dosage, time: form.time, frequency: form.frequency, withFood: form.withFood, active: true };
+    save([...reminders, newR]);
     setForm({ medicine: '', dosage: '', time: '08:00', frequency: 'daily', withFood: false });
     setAdding(false);
   };
@@ -47,87 +40,104 @@ export default function Reminders() {
   const toggle = (id: string) => save(reminders.map(r => r.id === id ? { ...r, active: !r.active } : r));
   const remove = (id: string) => save(reminders.filter(r => r.id !== id));
 
+  const activeCount = reminders.filter(r => r.active).length;
+
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto p-4">
-        <div className="flex items-center gap-3 pt-4 mb-6">
-          <button onClick={() => router.push('/')} className="text-blue-600">← Back</button>
-          <h1 className="text-2xl font-bold text-gray-900">⏰ Medicine Reminders</h1>
+    <main style={{ minHeight: '100vh', backgroundColor: 'var(--bg-secondary)' }}>
+      <div style={{ maxWidth: '640px', margin: '0 auto', padding: '16px' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingTop: '16px', marginBottom: '20px' }}>
+          <button onClick={() => router.push('/')} style={{ color: 'var(--blue-accent)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px' }}>← Back</button>
+          <h1 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>⏰ Medicine Reminders</h1>
+          {activeCount > 0 && <span style={{ marginLeft: 'auto', backgroundColor: '#dcfce7', color: '#166534', fontSize: '12px', padding: '4px 10px', borderRadius: '20px', fontWeight: '600' }}>{activeCount} active</span>}
         </div>
 
-        {reminders.length === 0 && !adding && (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm border mb-4">
-            <div className="text-5xl mb-3">💊</div>
-            <p className="text-gray-600 font-medium">No reminders set yet</p>
-            <p className="text-gray-400 text-sm mt-1">Add your medicines to get daily reminders</p>
+        {reminders.length === 0 && !adding ? (
+          <div style={{ backgroundColor: 'var(--bg-card)', borderRadius: '20px', padding: '48px 24px', textAlign: 'center', border: '1px solid var(--border-color)', marginBottom: '16px' }}>
+            <div style={{ fontSize: '56px', marginBottom: '12px' }}>💊</div>
+            <p style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '16px', margin: '0 0 4px 0' }}>No reminders yet</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 20px 0' }}>Add medicines to track your doses</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+            {reminders.map(r => (
+              <div key={r.id} style={{ backgroundColor: 'var(--bg-card)', borderRadius: '16px', padding: '16px', border: `1px solid ${r.active ? 'var(--border-color)' : 'var(--border-color)'}`, opacity: r.active ? 1 : 0.5, boxShadow: 'var(--shadow)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '15px', margin: '0 0 2px 0' }}>{r.medicine}</p>
+                    {r.dosage && <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 8px 0' }}>{r.dosage}</p>}
+                    {r.purpose && <p style={{ fontSize: '12px', color: '#2563eb', margin: '0 0 8px 0' }}>For: {r.purpose}</p>}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ backgroundColor: '#eff6ff', color: '#1d4ed8', fontSize: '11px', padding: '3px 10px', borderRadius: '20px', fontWeight: '600' }}>⏰ {r.time}</span>
+                      <span style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontSize: '11px', padding: '3px 10px', borderRadius: '20px' }}>{r.frequency}</span>
+                      {r.withFood && <span style={{ backgroundColor: '#f0fdf4', color: '#166534', fontSize: '11px', padding: '3px 10px', borderRadius: '20px' }}>🍽️ With food</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginLeft: '12px' }}>
+                    <button onClick={() => toggle(r.id)} style={{ fontSize: '11px', padding: '4px 12px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontWeight: '600', backgroundColor: r.active ? '#dcfce7' : 'var(--bg-secondary)', color: r.active ? '#166534' : 'var(--text-muted)' }}>
+                      {r.active ? '✓ Active' : 'Paused'}
+                    </button>
+                    <button onClick={() => remove(r.id)} style={{ backgroundColor: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '18px', padding: '0 4px' }}>×</button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {reminders.map(r => (
-          <div key={r.id} className={`bg-white rounded-2xl p-4 shadow-sm border mb-3 ${!r.active ? 'opacity-50' : ''}`}>
-            <div className="flex items-start justify-between">
+        {adding && (
+          <div style={{ backgroundColor: 'var(--bg-card)', borderRadius: '20px', padding: '20px', border: '1px solid var(--border-color)', marginBottom: '16px' }}>
+            <h2 style={{ fontWeight: '700', color: 'var(--text-primary)', marginBottom: '16px', fontSize: '16px' }}>Add New Reminder</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <p className="font-bold text-gray-900">{r.medicine}</p>
-                {r.dosage && <p className="text-sm text-gray-600">{r.dosage}</p>}
-                <div className="flex gap-2 mt-2">
-                  <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">⏰ {r.time}</span>
-                  <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{r.frequency}</span>
-                  {r.withFood && <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">🍽️ With food</span>}
+                <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: '700', textTransform: 'uppercase' }}>Medicine Name *</label>
+                <input value={form.medicine} onChange={e => setForm({ ...form, medicine: e.target.value })}
+                  placeholder="e.g. Metformin 500mg"
+                  style={{ width: '100%', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '10px 14px', fontSize: '14px', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: '700', textTransform: 'uppercase' }}>Dosage</label>
+                <input value={form.dosage} onChange={e => setForm({ ...form, dosage: e.target.value })}
+                  placeholder="e.g. 500mg, 1 tablet"
+                  style={{ width: '100%', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '10px 14px', fontSize: '14px', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: '700', textTransform: 'uppercase' }}>Time</label>
+                  <input type="time" value={form.time} onChange={e => setForm({ ...form, time: e.target.value })}
+                    style={{ width: '100%', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '10px 14px', fontSize: '14px', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: '700', textTransform: 'uppercase' }}>Frequency</label>
+                  <select value={form.frequency} onChange={e => setForm({ ...form, frequency: e.target.value })}
+                    style={{ width: '100%', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '10px 14px', fontSize: '14px', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', boxSizing: 'border-box' }}>
+                    <option value="daily">Once daily</option>
+                    <option value="twice daily">Twice daily</option>
+                    <option value="three times daily">3 times daily</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => toggle(r.id)} className={`text-xs px-3 py-1 rounded-full ${r.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                  {r.active ? 'Active' : 'Paused'}
-                </button>
-                <button onClick={() => remove(r.id)} className="text-red-400 hover:text-red-600">✕</button>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                <input type="checkbox" checked={form.withFood} onChange={e => setForm({ ...form, withFood: e.target.checked })} style={{ width: '16px', height: '16px' }} />
+                <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Take with food</span>
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <button onClick={() => setAdding(false)} style={{ padding: '12px', borderRadius: '14px', border: '1px solid var(--border-color)', backgroundColor: 'transparent', color: 'var(--text-secondary)', fontSize: '14px', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
+                <button onClick={add} disabled={!form.medicine.trim()} style={{ padding: '12px', borderRadius: '14px', border: 'none', backgroundColor: '#2563eb', color: 'white', fontSize: '14px', cursor: 'pointer', fontWeight: '600', opacity: !form.medicine.trim() ? 0.5 : 1 }}>Save Reminder</button>
               </div>
-            </div>
-          </div>
-        ))}
-
-        {adding && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm border mb-4">
-            <h2 className="font-bold text-gray-900 mb-4">Add New Reminder</h2>
-            <input value={form.medicine} onChange={e => setForm({...form, medicine: e.target.value})}
-              placeholder="Medicine name (e.g. Metformin)" className="w-full border rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:border-blue-400"/>
-            <input value={form.dosage} onChange={e => setForm({...form, dosage: e.target.value})}
-              placeholder="Dosage (e.g. 500mg)" className="w-full border rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:border-blue-400"/>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <label className="text-xs text-gray-500 mb-1 block">TIME</label>
-                <input type="time" value={form.time} onChange={e => setForm({...form, time: e.target.value})}
-                  className="w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400"/>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 mb-1 block">FREQUENCY</label>
-                <select value={form.frequency} onChange={e => setForm({...form, frequency: e.target.value})}
-                  className="w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
-                  <option value="daily">Daily</option>
-                  <option value="twice daily">Twice daily</option>
-                  <option value="three times daily">3x daily</option>
-                  <option value="weekly">Weekly</option>
-                </select>
-              </div>
-            </div>
-            <label className="flex items-center gap-2 mb-4 cursor-pointer">
-              <input type="checkbox" checked={form.withFood} onChange={e => setForm({...form, withFood: e.target.checked})} className="w-4 h-4"/>
-              <span className="text-sm text-gray-700">Take with food</span>
-            </label>
-            <div className="flex gap-3">
-              <button onClick={() => setAdding(false)} className="flex-1 border border-gray-300 text-gray-600 py-2 rounded-xl text-sm">Cancel</button>
-              <button onClick={add} className="flex-1 bg-blue-600 text-white py-2 rounded-xl text-sm font-semibold">Save Reminder</button>
             </div>
           </div>
         )}
 
         {!adding && (
-          <button onClick={() => setAdding(true)} className="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl">
+          <button onClick={() => setAdding(true)} style={{ width: '100%', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '16px', padding: '14px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', marginBottom: '12px' }}>
             + Add Medicine Reminder
           </button>
         )}
 
-        <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-xl p-3">
-          <p className="text-yellow-800 text-xs">💡 Tip: For actual phone notifications, install MedicalPlain as an app (tap "Add to Home Screen" in your browser).</p>
+        <div style={{ backgroundColor: '#fffbeb', border: '1px solid #fbbf24', borderRadius: '14px', padding: '12px 16px', marginBottom: '80px' }}>
+          <p style={{ fontSize: '12px', color: '#92400e', margin: 0 }}>💡 For actual phone notifications, install MedicalPlain as an app — tap "Add to Home Screen" in your browser.</p>
         </div>
       </div>
     </main>

@@ -34,6 +34,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="max-w-2xl mx-auto px-4 py-8">
+
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm mb-4">
             <span>🏥</span> Pro Medical AI
@@ -55,8 +56,8 @@ export default function Home() {
           {loading ? (
             <div>
               <div className="text-5xl mb-4">🔬</div>
-              <p className="text-xl font-semibold text-blue-600">Running clinical analysis...</p>
-              <p className="text-gray-500 mt-2">Checking drugs, interactions, lab values</p>
+              <p className="text-xl font-semibold text-blue-600">Analyzing with AI...</p>
+              <p className="text-gray-500 mt-2">Running clinical-level analysis</p>
               <div className="mt-4 bg-blue-100 rounded-full h-2 w-48 mx-auto overflow-hidden">
                 <div className="bg-blue-600 h-full rounded-full animate-pulse w-3/4"></div>
               </div>
@@ -77,25 +78,40 @@ export default function Home() {
         <input id="fileInput" type="file" accept="image/*,.pdf" className="hidden"
           onChange={(e) => { const file = e.target.files?.[0]; if (file) handleFile(file); }} />
 
-        <button
-          onClick={() => router.push('/chat')}
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl p-4 flex items-center justify-between mb-6 hover:from-blue-700 hover:to-blue-800 transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl">👨‍⚕️</div>
-            <div className="text-left">
-              <p className="font-bold text-lg">Ask Dr. MedicalPlain</p>
-              <p className="text-blue-100 text-sm">MBBS AI • Drugs • Symptoms • Lab help</p>
+        {/* New 2-Button Layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          <button
+            onClick={() => router.push('/chat')}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl p-4 flex items-center justify-between hover:from-blue-700 hover:to-blue-800 transition-all shadow-sm"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl">👨‍⚕️</div>
+              <div className="text-left">
+                <p className="font-bold text-lg">Ask AI Doctor</p>
+                <p className="text-blue-100 text-sm">Medical chat</p>
+              </div>
             </div>
-          </div>
-          <span className="text-2xl">→</span>
-        </button>
+          </button>
+
+          <button
+            onClick={() => router.push('/symptoms')}
+            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-2xl p-4 flex items-center justify-between hover:from-purple-700 hover:to-purple-800 transition-all shadow-sm"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl">🤒</div>
+              <div className="text-left">
+                <p className="font-bold text-lg">Check Symptoms</p>
+                <p className="text-purple-100 text-sm">AI triage tool</p>
+              </div>
+            </div>
+          </button>
+        </div>
 
         <div className="grid grid-cols-2 gap-3 mb-6">
           {[
             { icon: '💊', title: 'Drug Analysis', desc: 'Full risk profile, interactions, timing' },
             { icon: '🔬', title: 'Lab Interpretation', desc: 'What every value means clinically' },
-            { icon: '⚠️', title: 'Risk Scoring', desc: 'Side effect risk percentages' },
+            { icon: '⚠️', title: 'Risk Scoring', desc: 'Percentage risk for side effects' },
             { icon: '❓', title: 'Doctor Questions', desc: '5 questions to ask your doctor' },
           ].map((f, i) => (
             <div key={i} className="bg-white rounded-xl p-4 shadow-sm border">

@@ -7,13 +7,15 @@ export default function PWAInstall() {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
+    const dismissed = sessionStorage.getItem('pwaDismissed');
+    if (dismissed) return;
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setTimeout(() => setShowBanner(true), 3000);
+      setTimeout(() => setShowBanner(true), 5000);
     });
   }, []);
 
@@ -21,22 +23,28 @@ export default function PWAInstall() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setShowBanner(false);
+    setShowBanner(false);
     setDeferredPrompt(null);
+  };
+
+  const dismiss = () => {
+    sessionStorage.setItem('pwaDismissed', 'true');
+    setShowBanner(false);
   };
 
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 bg-white border-2 border-blue-500 rounded-2xl p-4 shadow-2xl z-50 flex items-center gap-3">
+    <div className="fixed bottom-4 left-4 right-4 rounded-2xl p-4 shadow-2xl z-50 flex items-center gap-3"
+      style={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--blue-accent)' }}>
       <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0">M</div>
       <div className="flex-1">
-        <p className="font-bold text-gray-900 text-sm">Install MedicalPlain</p>
-        <p className="text-xs text-gray-500">Add to home screen for quick access</p>
+        <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Install MedicalPlain</p>
+        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Add to home screen for quick access</p>
       </div>
       <div className="flex gap-2">
-        <button onClick={() => setShowBanner(false)} className="text-gray-400 text-sm px-2">Not now</button>
-        <button onClick={install} className="bg-blue-600 text-white text-sm px-4 py-2 rounded-xl font-semibold">Install</button>
+        <button onClick={dismiss} className="text-xs px-2 py-1 rounded-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
+        <button onClick={install} className="bg-blue-600 text-white text-xs px-3 py-2 rounded-xl font-semibold">Install</button>
       </div>
     </div>
   );

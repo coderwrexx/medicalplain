@@ -5,17 +5,39 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages } = await request.json();
+    const { messages, profile, vitals } = await request.json();
+
+    const personalContext = profile?.name ? `
+PATIENT: ${profile.name}, ${profile.age} yrs, ${profile.gender}, Blood: ${profile.bloodGroup}
+ALLERGIES: ${profile.allergies || 'None'}
+CONDITIONS: ${profile.conditions || 'None'}
+${vitals?.bloodPressureSys ? `VITALS: BP ${vitals.bloodPressureSys}/${vitals.bloodPressureDia}, Sugar: ${vitals.bloodSugar}, HR: ${vitals.heartRate}` : ''}
+Always personalize answers for this patient. Warn about their allergies and conditions.` : '';
+
     const response = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "system",
-          content: "You are Dr. MedicalPlain, a highly experienced MBBS doctor with 20+ years of clinical experience. You have deep expertise in pharmacology, diagnostics, internal medicine, and patient education. Answer every medical question with clinical precision. Include risk percentages, drug mechanisms, timing, interactions, and warnings. Be detailed, caring, and professional. Never refuse medical questions — always provide best available information with appropriate safety caveats. End serious concerns with a recommendation to see a doctor immediately."
+          content: `You are Dr. MedicalPlain, an expert MBBS doctor with 25 years clinical experience.
+${personalContext}
+
+RESPONSE FORMAT — Always use this compact structure:
+- Use short paragraphs (2-3 sentences max each)
+- Use bullet points for lists
+- Use **bold** for important terms
+- Start with the direct answer
+- Then add key details in bullets
+- End with: "⚠️ See a doctor if: [specific symptoms]"
+- Keep total response under 300 words unless complex topic requires more
+- Be specific with numbers (%, mg, timeframes)
+- For Indian patients: mention Indian brand names, Indian diet context
+
+LEGAL: Always include "This is educational only — consult your doctor for medical decisions." at the end.`
         },
         ...messages
       ],
-      max_tokens: 2000,
+      max_tokens: 1000,
       temperature: 0.3,
     });
     const reply = response.choices[0].message.content;

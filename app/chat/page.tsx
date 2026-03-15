@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import VoiceInput from '../components/VoiceInput';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -9,23 +10,33 @@ interface Message {
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: 'Hello! I am Dr. MedicalPlain, your personal MBBS-level AI doctor.\n\nI can help you with:\n\n💊 Medication questions — dosage, side effects, interactions\n🔬 Lab report interpretation\n🏥 Symptoms and what they mean\n⚠️ Drug safety and risk percentages\n🍎 Diet and lifestyle advice\n\nWhat would you like to know today?'
-    }
+    { role: 'assistant', content: 'Hello! I am Dr. MedicalPlain, your personal MBBS-level AI doctor. I can help with medications, lab reports, symptoms, drug interactions, nutrition, and mental health.\n\nYou can type or use the 🎤 voice button to speak your question.\n\nWhat would you like to know today?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
-  const send = async () => {
-    if (!input.trim() || loading) return;
-    const userMsg: Message = { role: 'user', content: input };
+  const speak = (text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.slice(0, 500));
+    utterance.lang = 'en-IN';
+    utterance.rate = 0.9;
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => { window.speechSynthesis.cancel(); setSpeaking(false); };
+
+  const send = async (text?: string) => {
+    const msg = text || input;
+    if (!msg.trim() || loading) return;
+    const userMsg: Message = { role: 'user', content: msg };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setInput('');
@@ -37,7 +48,8 @@ export default function Chat() {
         body: JSON.stringify({ messages: newMessages }),
       });
       const data = await res.json();
-      setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
+      const reply = data.reply || 'Sorry, something went wrong.';
+      setMessages([...newMessages, { role: 'assistant', content: reply }]);
     } catch {
       setMessages([...newMessages, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }]);
     }
@@ -45,11 +57,14 @@ export default function Chat() {
   };
 
   const quickQuestions = [
-    "Side effects of Metformin?",
-    "My HbA1c is 7.2, is that bad?",
-    "Can I take Paracetamol + Ibuprofen?",
-    "What does high creatinine mean?",
-    "Is Paracetamol safe in pregnancy?",
+    'Side effects of Metformin?',
+    'My HbA1c is 7.2, is that bad?',
+    'Can I take Paracetamol + Ibuprofen?',
+    'What does high creatinine mean?',
+    'Is Paracetamol safe in pregnancy?',
+    'What causes high blood pressure?',
+    'How to control diabetes with diet?',
+    'What is a normal cholesterol level?',
   ];
 
   return (
@@ -59,19 +74,27 @@ export default function Chat() {
         <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">Dr</div>
         <div>
           <p className="font-bold text-gray-900">Dr. MedicalPlain</p>
-          <p className="text-xs text-green-500">● Online — MBBS AI Medical Expert</p>
+          <p className="text-xs text-green-500">● Online — MBBS AI Expert</p>
         </div>
+        {speaking && (
+          <button onClick={stopSpeaking} className="ml-auto bg-red-100 text-red-600 text-xs px-3 py-1 rounded-full">
+            ⏹️ Stop
+          </button>
+        )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-40">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-44">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-              msg.role === 'user'
-                ? 'bg-blue-600 text-white rounded-br-none'
-                : 'bg-white text-gray-800 shadow-sm border rounded-bl-none'
+              msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-gray-800 shadow-sm border rounded-bl-none'
             }`}>
               {msg.content}
+              {msg.role === 'assistant' && (
+                <button onClick={() => speak(msg.content)} className="mt-2 text-xs text-gray-400 hover:text-blue-500 block">
+                  🔊 Listen
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -91,28 +114,26 @@ export default function Chat() {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 shadow-lg">
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-2">
           {quickQuestions.map((q, i) => (
-            <button key={i} onClick={() => setInput(q)}
-              className="whitespace-nowrap text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-200 hover:bg-blue-100 flex-shrink-0">
+            <button key={i} onClick={() => send(q)}
+              className="whitespace-nowrap text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-200 flex-shrink-0">
               {q}
             </button>
           ))}
         </div>
         <div className="flex gap-2">
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
+          <VoiceInput onTranscript={(text) => { setInput(text); send(text); }} />
+          <input value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
             placeholder="Ask any medical question..."
-            className="flex-1 border rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
-          />
-          <button onClick={send} disabled={loading || !input.trim()}
-            className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-40 text-lg">
+            className="flex-1 border rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"/>
+          <button onClick={() => send()} disabled={loading || !input.trim()}
+            className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-40">
             ➤
           </button>
         </div>
-        <p className="text-center text-xs text-gray-400 mt-1">For emergencies call 112. Not a substitute for professional care.</p>
+        <p className="text-center text-xs text-gray-400 mt-1">Emergency: 112 | Ambulance: 108</p>
       </div>
     </div>
   );

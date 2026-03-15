@@ -49,7 +49,6 @@ export default function Results() {
     }
 
     try {
-      // FIX: Added useCORS and changed to lightweight JPEG
       const canvas = await html2canvas(element, { 
         scale: 2,
         useCORS: true, 
@@ -102,7 +101,6 @@ export default function Results() {
           <LanguageSelector currentLang={lang} onChange={handleLanguageChange} />
         </div>
 
-        {/* Wrap the content to be captured in a div with id="report-content" */}
         <div id="report-content" className="bg-gray-50 pb-4">
             <div className="bg-white rounded-2xl p-6 shadow-sm border mb-4">
               <div className="flex items-start justify-between mb-3">
@@ -304,47 +302,15 @@ export default function Results() {
               </div>
             )}
 
-            {data.drugInteractionWarnings?.length > 0 && (
-              <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5 mb-4">
-                <h2 className="text-lg font-bold text-orange-800 mb-3">🔄 Drug Interaction Warnings</h2>
-                {data.drugInteractionWarnings.map((w: string, i: number) => (
-                  <p key={i} className="text-orange-700 text-sm mb-1">⚠️ {w}</p>
-                ))}
-              </div>
-            )}
-
-            {(data.dietaryRestrictions?.length > 0 || data.lifestyleAdvice?.length > 0) && (
-              <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-4">
-                <h2 className="text-lg font-bold text-green-800 mb-3">🥗 Diet & Lifestyle</h2>
-                {data.dietaryRestrictions?.map((d: string, i: number) => (
-                  <p key={i} className="text-green-700 text-sm mb-1">🚫 {d}</p>
-                ))}
-                {data.lifestyleAdvice?.map((a: string, i: number) => (
-                  <p key={i} className="text-green-700 text-sm mb-1">✅ {a}</p>
-                ))}
-              </div>
-            )}
-
-            {data.questionsToAsk?.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border p-5 mb-4">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">❓ Questions to Ask Your Doctor</h2>
-                <div className="space-y-3">
-                  {data.questionsToAsk.map((q: string, i: number) => (
-                    <div key={i} className="flex items-start gap-3 bg-blue-50 rounded-xl p-3">
-                      <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">{i+1}</span>
-                      <p className="text-gray-800 text-sm">{q}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {data.followUpRecommendations?.length > 0 && (
-              <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5 mb-4">
-                <h2 className="text-lg font-bold text-purple-800 mb-3">📅 Follow-up Recommendations</h2>
-                {data.followUpRecommendations.map((r: string, i: number) => (
-                  <p key={i} className="text-purple-700 text-sm mb-1">• {r}</p>
-                ))}
+            {/* NEW: Phase 10 - Insurance Lead Gen Banner */}
+            {data.overallRiskScore && (data.overallRiskScore.toLowerCase() === 'medium' || data.overallRiskScore.toLowerCase() === 'high') && (
+              <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-4">
+                <h2 className="text-lg font-bold text-indigo-800 mb-2">🛡️ Protect Your Health & Finances</h2>
+                <p className="text-indigo-700 text-sm mb-4">Your analysis indicates potential health risks. Medical emergencies can be expensive. Ensure you are covered with health insurance starting at ₹300/month.</p>
+                <a href="https://www.policybazaar.com/health-insurance/" target="_blank" rel="noopener noreferrer"
+                  className="inline-block bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:bg-indigo-700 transition-all">
+                  Check Free Quotes →
+                </a>
               </div>
             )}
 
@@ -362,7 +328,6 @@ export default function Results() {
             </div>
         </div>
 
-        {/* Buttons remain outside the PDF capture area */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           <button
             onClick={() => {
@@ -381,7 +346,6 @@ export default function Results() {
           </button>
         </div>
 
-        {/* New Download PDF Button */}
         <div className="mb-8">
              <button
               onClick={downloadPDF}

@@ -1,16 +1,41 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import LanguageSelector from '../components/LanguageSelector';
 
 export default function Results() {
   const [data, setData] = useState<any>(null);
+  const [lang, setLang] = useState('en');
+  const [translating, setTranslating] = useState(false);
+  const [translatedSummary, setTranslatedSummary] = useState('');
   const router = useRouter();
 
   useEffect(() => {
     const stored = localStorage.getItem('analysisResult');
     if (!stored) { router.push('/'); return; }
-    setData(JSON.parse(stored));
+    const parsed = JSON.parse(stored);
+    setData(parsed);
+    setTranslatedSummary(parsed.summary || '');
   }, []);
+
+  const handleLanguageChange = async (newLang: string) => {
+    setLang(newLang);
+    if (newLang === 'en' || !data) return;
+    setTranslating(true);
+    const langNames: any = { hi: 'Hindi', ta: 'Tamil', te: 'Telugu' };
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: data.summary, targetLanguage: langNames[newLang] }),
+      });
+      const result = await res.json();
+      setTranslatedSummary(result.translated);
+    } catch {
+      setTranslatedSummary(data.summary);
+    }
+    setTranslating(false);
+  };
 
   if (!data) return <div className="min-h-screen flex items-center justify-center"><p>Loading...</p></div>;
 
@@ -33,9 +58,14 @@ export default function Results() {
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto p-4">
 
-        <div className="flex items-center gap-3 mb-6 pt-4">
+        <div className="flex items-center gap-3 mb-4 pt-4">
           <button onClick={() => router.push('/')} className="text-blue-600 hover:underline text-sm">← New Analysis</button>
-          <button onClick={() => router.push('/chat')} className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-full text-sm">💬 Ask Dr. MedicalPlain</button>
+          <button onClick={() => router.push('/chat')} className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-full text-sm">💬 Ask Doctor</button>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 shadow-sm border mb-4">
+          <p className="text-xs text-gray-500 mb-2 font-semibold">TRANSLATE RESULTS</p>
+          <LanguageSelector currentLang={lang} onChange={handleLanguageChange} />
         </div>
 
         <div className="bg-white rounded-2xl p-6 shadow-sm border mb-4">
@@ -47,7 +77,11 @@ export default function Results() {
               </span>
             )}
           </div>
-          <p className="text-gray-700 leading-relaxed">{data.summary}</p>
+          {translating ? (
+            <div className="animate-pulse bg-gray-100 h-16 rounded-xl"/>
+          ) : (
+            <p className="text-gray-700 leading-relaxed">{translatedSummary || data.summary}</p>
+          )}
           {data.overallHealthStatus && (
             <p className="text-sm text-gray-500 mt-2">Status: <span className="font-semibold">{data.overallHealthStatus}</span></p>
           )}
@@ -111,9 +145,7 @@ export default function Results() {
                       <div>
                         <p className="text-xs font-bold text-gray-600 mb-2">SIDE EFFECTS
                           {med.sideEffects.riskPercentage && (
-                            <span className="ml-2 bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-normal">
-                              {med.sideEffects.riskPercentage}
-                            </span>
+                            <span className="ml-2 bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-normal">{med.sideEffects.riskPercentage}</span>
                           )}
                         </p>
                         <div className="grid grid-cols-2 gap-2">
@@ -173,6 +205,17 @@ export default function Results() {
                         <p className="text-sm text-blue-800 font-medium">📌 {med.importantNote}</p>
                       </div>
                     )}
+                    <div className="bg-green-50 rounded-xl p-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-green-700 font-semibold">💊 Buy this medicine</p>
+                        <p className="text-xs text-green-600">{med.name} — best price online</p>
+                      </div>
+                      <a href={`https://www.netmeds.com/catalogsearch/result?q=${encodeURIComponent(med.name)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">
+                        Buy on Netmeds →
+                      </a>
+                    </div>
                     {med.missedDoseInstruction && (
                       <p className="text-xs text-gray-600"><span className="font-semibold">Missed dose: </span>{med.missedDoseInstruction}</p>
                     )}
@@ -218,9 +261,6 @@ export default function Results() {
                     <div className="mt-2 bg-gray-50 rounded-lg p-2">
                       <p className="text-xs text-gray-600"><span className="font-semibold">Possible causes: </span>{lab.possibleCauses.join(', ')}</p>
                     </div>
-                  )}
-                  {lab.whatToMonitor && (
-                    <p className="text-xs text-gray-500 mt-1"><span className="font-semibold">Monitor: </span>{lab.whatToMonitor}</p>
                   )}
                 </div>
               ))}
@@ -272,6 +312,15 @@ export default function Results() {
           </div>
         )}
 
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-4">
+          <h2 className="text-lg font-bold text-blue-800 mb-3">🏥 Book a Real Doctor</h2>
+          <p className="text-blue-700 text-sm mb-3">Our AI flagged items that may need professional attention. Consult a real doctor today.</p>
+          <a href="https://www.practo.com" target="_blank" rel="noopener noreferrer"
+            className="inline-block bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-semibold">
+            Book on Practo →
+          </a>
+        </div>
+
         <div className="bg-gray-100 rounded-2xl p-4 mb-4 text-center">
           <p className="text-gray-600 text-xs">{data.disclaimer}</p>
         </div>
@@ -279,7 +328,7 @@ export default function Results() {
         <div className="grid grid-cols-2 gap-3 mb-8">
           <button
             onClick={() => {
-              const text = `I used MedicalPlain AI to get a clinical-level analysis of my medical document. Try it free at medicalplain.vercel.app`;
+              const text = `I used MedicalPlain AI for a clinical-level analysis of my medical document. Try it free at medicalplain.vercel.app`;
               window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
             }}
             className="bg-green-500 text-white font-semibold py-3 rounded-xl text-sm hover:bg-green-600"
